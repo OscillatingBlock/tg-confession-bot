@@ -1,5 +1,3 @@
-# tg-confession-bot
-
 
 # Telegram Confession Bot
 
