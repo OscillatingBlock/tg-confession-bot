@@ -1,4 +1,5 @@
 anyio==4.6.0
+python-dotenv
 APScheduler==3.10.4
 certifi==2024.8.30
 charset-normalizer==3.4.0

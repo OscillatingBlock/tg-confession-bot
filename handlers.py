@@ -3,7 +3,10 @@ import asyncio
 from telegram import ChatMember, Update, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import ChatMemberHandler, filters, ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, InlineQueryHandler
 from uuid import uuid4
+import os
 import telegram.ext
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.basicConfig(
         filename = 'app.log',
@@ -35,15 +38,15 @@ async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def confess(update:Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("User %s made a confession", update.effective_user.username)
-    chat_id =  "@confessions_made_easy"
+    channel_id = os.getenv("CHANNEL_ID") 
     confession_text = ' '.join(context.args)
     confession_number = context.chat_data.get("confession_number", 22)
     global confessions_made
     if confession_text:
-        sent_message = await context.bot.send_message(chat_id=chat_id, text=f"#Confession_{confession_number} \n {confession_text}")
+        sent_message = await context.bot.send_message(chat_id=channel_id, text=f"#Confession_{confession_number} \n {confession_text}")
         context.chat_data["confession_number"] = confession_number + 1
         forwarded_message_id = sent_message.message_id
-        message_link = f"https://t.me/confessions_made_easy/{forwarded_message_id}"
+        message_link = f"https://t.me/{channel_id[1:]}/{forwarded_message_id}"
         await context.bot.send_message(chat_id = update.effective_chat.id, text=f"Confession made!, view it [here]({message_link})", reply_to_message_id=update.message.message_id, parse_mode='Markdown')
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a confession after /confess.", reply_to_message_id=update.message.message_id)
