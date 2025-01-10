@@ -40,7 +40,7 @@ async def confess(update:Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("User %s made a confession", update.effective_user.username)
     channel_id = os.getenv("CHANNEL_ID") 
     confession_text = ' '.join(context.args)
-    confession_number = context.chat_data.get("confession_number", 22)
+    confession_number = context.chat_data.get("confession_number", 27)
     global confessions_made
     if confession_text:
         sent_message = await context.bot.send_message(chat_id=channel_id, text=f"#Confession_{confession_number} \n {confession_text}")
@@ -50,6 +50,9 @@ async def confess(update:Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id = update.effective_chat.id, text=f"Confession made!, view it [here]({message_link})", reply_to_message_id=update.message.message_id, parse_mode='Markdown')
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a confession after /confess.", reply_to_message_id=update.message.message_id)
+
+async def confess_without_link(update: Update, context=ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Confessions with links are not allowed.")
 
 async def greet_new_user(update:Update, context:ContextTypes.DEFAULT_TYPE):
     for new_member in update.effective_message.new_chat_members:
