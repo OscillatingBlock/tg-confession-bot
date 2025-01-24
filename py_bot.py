@@ -9,7 +9,7 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TOKEN).build()
-    application.add_handler(CommandHandler('timer', handlers.callback_timer))
+    """ application.add_handler(CommandHandler('timer', handlers.callback_timer)) """
     application.add_handler(CommandHandler('start', handlers.start))
     application.add_handler(CommandHandler('chat_id', handlers.get_chat_id))
     application.add_handler(CommandHandler('confess', handlers.confess, filters=~filters.Entity("url")))
@@ -20,8 +20,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler('spurge', handlers.spurge))
     application.add_handler(CommandHandler('unban', handlers.unban_user))
     application.add_handler(CommandHandler('kick', handlers.kick_user))
+    application.add_handler(CommandHandler('summary', handlers.summary))
     application.add_handler(MessageHandler(filters.COMMAND, handlers.unknown))
-
     # Start polling for updates
     application.run_polling()
-

@@ -6,7 +6,15 @@ from uuid import uuid4
 import os
 import telegram.ext
 from dotenv import load_dotenv
+from telegram.constants import ParseMode 
+from telegram.helpers import escape_markdown 
+import google.generativeai as genai
+
 load_dotenv()
+
+api_key = os.environ.get("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel('gemini-pro')
 
 logger = logging.basicConfig(
         filename = 'app.log',
@@ -19,18 +27,6 @@ logger = logging.getLogger(__name__)  # __name__ will set the logger's name to t
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("%s started the bot", update.effective_user.username)
     await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
-
-async def callback_alarm(context: ContextTypes.DEFAULT_TYPE):
-    # Beep the person who called this alarm:
-    job_data = context.job.data
-    await context.bot.send_message(chat_id = context.job.chat_id, text=f'BEEP!', reply_to_message_id = job_data["message_id"])
- 
-async def callback_timer(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    message_id = update.message.message_id
-    await context.bot.send_message(chat_id=chat_id, text='Setting a timer for 1 minute!')
-    # Set the alarm:
-    context.job_queue.run_once(callback_alarm, 60, data={"message_id": message_id}, chat_id=chat_id)
 
 async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
@@ -122,3 +118,8 @@ async def spurge(update:Update, context:ContextTypes.DEFAULT_TYPE):
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didnt understand that command.")
 
+async def summary(update: Update,context: ContextTypes.DEFAULT_TYPE):
+    prompt = update.message.text
+    response = model.generate_content(f"You are a telgram bot who s roleplaying denji from chainsaw man, reply to the prompt which user sends to you as denji would reply, add markdown only which is supported on telegram, here is the users prompt {prompt}")
+    escaped_text = escape_markdown(response.text, version=2)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=escaped_text,  parse_mode=ParseMode.MARKDOWN_V2 ) 
